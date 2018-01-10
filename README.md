@@ -300,25 +300,25 @@ extended link pattern uses extra square brackets.
 
 Examples: 
 
-{{{text
+```text
 Extended Link           Resulting HTML
 \-----------------------------------------------------
 [[LINK]]                <a href="LINK">LINK</a>
 [[LINK][NAME]]          <a href="LINK">NAME</a>
-}}}
+```
 
 In order to do this, you must `M-x customize-option` the list of
 formatting rules, `wiki-pub-rules`. Add the following two rules at the
 end:
 
-{{{text
+```text
 INS DEL Choice: Value Menu Rule:
             Choice: Value Menu Search a regexp: \[\[\([^]]+\)\]\[\([^]]+\)\]\]
             Choice: Value Menu Insert or replace a string: <a href="\1">\2</a>
 INS DEL Choice: Value Menu Rule:
             Choice: Value Menu Search a regexp: \[\[\([^]]+\)\]\]
             Choice: Value Menu Insert or replace a string: <a href="\1">\1</a>
-}}}
+```
 
 This doesn't change `wiki-name-regexp` and thus `wiki-next-reference`
 and friends will not work.
@@ -350,29 +350,29 @@ an anchor, use the `PageName#Anchor` link pattern.
 
 Examples:
 
-{{{text
+```text
 Anchor                Resulting HTML
 \-----------------------------------------------------
 #NAME                   <a name="NAME">
 PAGE#NAME               <a href="PAGE#NAME">PAGE</a>
-}}}
+```
 
 Here are the necessary rules to it. Customize `wiki-pub-rules` and add
 these rules *after* `wiki-replace-links`.
 
 The rule for the `#ANCHOR`:
 
-{{{text
+```text
 Regexp:      ^#\(\sw+\)
 Replacement: <a name="\1">
-}}}
+```
 
 The rule for <nowiki>PageName#Anchor</nowiki> references:
 
-{{{text
+```text
 Regexp:      <a href="\(\(\|.\)*\)\.html">\(\(\|.\)*\)</a>#\(\sw+\)
 Replacement: <a href="\1.html#\5">\3</a>
-}}}
+```
 
 Note how the second rule just rearranges the HTML links produced by
 `wiki-replace-links`.
@@ -408,22 +408,22 @@ in learning more! 😊 -- AlexSchroeder
 Define an appropriate rule for `wiki-pub-rules`. Here is an example
 rule:
 
-{{{elisp
+```elisp
     Regexp:      \<Inline:\(\(\sw\|[-_.]\)+\)\.\(png\|jpg\)\>
     Replacement: <a href="pics/\1.\3"><img src="pics/\1.\3" alt="\1.\3"></a>
-}}}
+```
 
 That would replace the following:
 
-{{{text
+```text
 Inline:somename.png
-}}}
+```
 
 with this:
 
-{{{html
+```html
 <a href="pics/somename.png"><img src="pics/somename.png" alt="somename.png"></a>
-}}}
+```
 
 In effect, it would be replaced with the `<img src="...">` tag, marked
 as a link and using an appropriate alt text, assuming that all
@@ -435,7 +435,7 @@ The easiest way to do this is using Wiki Inter code. Just add virtual
 hosts to `wiki-inter-links`. Here is the complete list of virtual
 hosts I'm using:
 
-{{{text
+```text
 Interwiki Host: Main
 URL Fragment: http://www.geocities.com/kensanata/%s.html
 
@@ -447,7 +447,7 @@ URL Fragment: http://www.geocities.com/kensanata/%s/
 
 Interwiki Host: Pic
 URL Fragment: http://www.geocities.com/kensanata/%s
-}}}
+```
 
 You could have achieved a similar effect using a rule in
 `wiki-pub-rules`. Such rules would not affect highlighting, however.
@@ -460,16 +460,16 @@ I use text-mode as my default major mode, therefore all wiki pages are
 in text mode. In text mode, I want the apostrophe to be considered a
 word separator.
 
-{{{elisp
+```elisp
 (setq default-major-mode 'text-mode)
 (modify-syntax-entry ?' "." text-mode-syntax-table)
-}}}
+```
 
 I want to use two spaces after a period. If I use one space, I want to
 alert myself to that. And when I use the magic `FIXME` string in text
 files, I want it to stand out.
 
-{{{elisp
+```elisp
 (defface extra-whitespace-face
   '((t (:background "pale green")))
   "Used in text-mode and friends for exactly one space after a period.")
@@ -477,49 +477,49 @@ files, I want it to stand out.
   'text-mode
   '(("FIXME[:!]?" 0 'show-paren-mismatch-face)
     ("\\.\\( \\)\\b" 1 'extra-whitespace-face)))
-}}}
+```
 
 Now for XEmacs, we need to load `easy-mmode.el`. I just use the source
 file from my Emacs lisp directory. And we need some time stuff for
 wiki interlinks, therefore I load these files from my Gnus directory.
 You might have them stored in other directories, obviously.
 
-{{{elisp
+```elisp
 (when (featurep 'xemacs)
   (load-file "/usr/local/share/emacs/20.7/lisp/emacs-lisp/easy-mmode.el")
   (load "~/elisp/gnus/lisp/parse-time.el" t t t)
   (load "~/elisp/gnus/lisp/time-date.el" t t t))
-}}}
+```
 
 We are getting to the wiki stuff at last. Load the mode and switch on
 `font-lock` and `auto-fill`.
 
-{{{elisp
+```elisp
 (load-library "wiki")
 (load-library "wiki-inter")
 ;; Usually text-mode buffers don't use font-lock!
 (add-hook 'wiki-mode-on-hook 'turn-on-font-lock)
 (add-hook 'wiki-mode-on-hook 'turn-on-auto-fill)
-}}}
+```
 
 In order to navigate and fill bullet lists, I patched my `fill.el`
 (thanks to Stefan Monnier). A marginal improvement.
 
-{{{elisp
+```elisp
 (load-library "fill"); Stefan's bugfix included
 (add-hook 'wiki-mode-on-hook (lambda ()
                                (setq paragraph-start "\\*\\|$" 
                                      paragraph-separate "$")))
-}}}
+```
 
 I want to use Shift TAB on GNU/Linux running under X to jump to the
 previous reference.
 
-{{{elisp
+```elisp
 (if (not (featurep 'xemacs))
     (define-key wiki-mode-map '[(shift iso-lefttab)] 'wiki-previous-reference)
   (define-key wiki-mode-map '[(iso-left-tab)] 'wiki-previous-reference))
-}}}
+```
 
 And now for the big thing. The markup. I added Wiki Summary and Wiki
 Language functions as well as the quoting of the ampersand (`&`).
@@ -528,7 +528,7 @@ address, and index page I keep to myself. 😎
 
 These are the new XHTML 1.0 publishing rules:
 
-{{{elisp
+```elisp
 (setq wiki-pub-rules
  `(my-wiki-store-language
    my-wiki-store-summary
@@ -556,11 +556,11 @@ These are the new XHTML 1.0 publishing rules:
    ("<\\?date>" . wiki-current-date)
    my-wiki-add-language
    my-wiki-add-summary))
-}}}
+```
 
 This is the old HTML 3.2 markup:
 
-{{{elisp
+```elisp
 (setq wiki-pub-rules
  `(my-wiki-store-language
    my-wiki-store-summary
@@ -584,13 +584,13 @@ This is the old HTML 3.2 markup:
    ("<\\?date>" . wiki-current-date)
    my-wiki-add-language
    my-wiki-add-summary))
-}}}
+```
 
 Another variant is to keep `wiki-pub-rules` defaults, and only change
 selected entries. Here, for example, I set the `end-of-buffer` rule
 only:
 
-{{{elisp
+```elisp
     (defun href (page &optional link)
       (setq link (or link page))
       (concat "<a href=\"" link ".html\">" page "</a>"))
@@ -607,11 +607,11 @@ only:
                     "Last change: <?date>\n"
                     "</body>\n"
                     "</html>"))
-}}}
+```
 
 If you want to add Wiki Language support, then all you really need is
 this simple `add-to-list`:
 
-{{{elisp
+```elisp
 (add-to-list 'wiki-pub-rules 'my-wiki-add-language)
-}}}
+```
