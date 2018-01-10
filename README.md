@@ -81,19 +81,19 @@ the variable `my-wiki-summary`. Later, we use the function
 (defvar my-wiki-summary nil)
 (defun my-wiki-store-summary ()
   (if (member (file-name-nondirectory buffer-file-name)
-			  wiki-summary-exclude-pages)
-	  (setq my-wiki-summary nil)
-	(setq my-wiki-summary (wiki-summarize))
-	(when my-wiki-summary
-	  (while (string-match "\"" my-wiki-summary)
-		(setq my-wiki-summary (replace-match "&quot;" t t my-wiki-summary))))))
+              wiki-summary-exclude-pages)
+      (setq my-wiki-summary nil)
+    (setq my-wiki-summary (wiki-summarize))
+    (when my-wiki-summary
+      (while (string-match "\"" my-wiki-summary)
+        (setq my-wiki-summary (replace-match "&quot;" t t my-wiki-summary))))))
 (defun my-wiki-add-summary ()
   (goto-char (point-min))
   (when (and my-wiki-summary
-			 (search-forward "</title>" nil t))
-	(insert "\n"
-			"<meta name=\"description\" content=\""
-			my-wiki-summary "\">")))
+             (search-forward "</title>" nil t))
+    (insert "\n"
+            "<meta name=\"description\" content=\""
+            my-wiki-summary "\">")))
 ```
 
 Now we need to install these two functions in `wiki-pub-rules`. See
@@ -131,7 +131,7 @@ code in my .emacs file:
 ```elisp
 (load "wiki-projects")
 (add-to-list 'wiki-projects
-			 `("EmacsWiki" (,(expand-file-name"~/EmacsWiki/")) nil nil))
+             `("EmacsWiki" (,(expand-file-name"~/EmacsWiki/")) nil nil))
 ```
 
 ## Don't mode me
@@ -154,9 +154,9 @@ We will need this for the next two sections!
 ```elisp
 (defvar guess-language-rules
   '(("en" . "\\<\\(of\\|the\\|and\\|or\\|how\\)\\>")
-	("de" . "\\<\\(und\\|oder\\|der\\|die\\|das\\|wie\\)\\>") 
-	("fr" . "\\<\\(et\\|ou\\|[ld]es\\|que\\)\\>")
-	("pt" . "\\<\\(de\\|para\\|e\\|ou\\|como\\)\\>"))
+    ("de" . "\\<\\(und\\|oder\\|der\\|die\\|das\\|wie\\)\\>") 
+    ("fr" . "\\<\\(et\\|ou\\|[ld]es\\|que\\)\\>")
+    ("pt" . "\\<\\(de\\|para\\|e\\|ou\\|como\\)\\>"))
   "Alist of rules to determine the language of some text.
 Each rule has the form (CODE . REGEXP) where CODE is a string to
 identify the language (probably according to ISO 639), and REGEXP is a
@@ -168,13 +168,13 @@ document.")
 (defun guess-buffer-language ()
   "Guess language in the current buffer."
   (save-excursion 
-	(goto-char (point-min))
-	(let ((count (map 'list (lambda (x)
-							  (cons (string-to-number
-									 (count-matches (cdr x))) (car x)))
-					  guess-language-rules)))
-	  (cdr (assoc (car (sort (map 'list 'car count) '>)) 
-				  count)))))
+    (goto-char (point-min))
+    (let ((count (map 'list (lambda (x)
+                              (cons (string-to-number
+                                     (count-matches (cdr x))) (car x)))
+                      guess-language-rules)))
+      (cdr (assoc (car (sort (map 'list 'car count) '>)) 
+                  count)))))
 ```
 
 Here is an interactive wrapper:
@@ -222,8 +222,8 @@ This code requires a Guess Buffer Language function, see below.
 (defun my-wiki-add-language ()
   (goto-char (point-min))
   (when (and my-wiki-language
-			 (search-forward "<body>" nil t))
-	(replace-match (format "<body lang=\"%s\">" my-wiki-language))))
+             (search-forward "<body>" nil t))
+    (replace-match (format "<body lang=\"%s\">" my-wiki-language))))
 ```
 
 Now we need to install this in `wiki-pub-rules`.
@@ -288,9 +288,9 @@ order to do all skipping with `case-fold-search'."
   "When variable `wiki-mode' is non-nil, `case-fold-search' will be
 bound to nil."
   (let ((case-fold-search case-fold-search))
-	(when wiki-mode
-	  (setq case-fold-search nil))
-	ad-do-it))
+    (when wiki-mode
+      (setq case-fold-search nil))
+    ad-do-it))
 ```
 
 ## Wiki Link (wiki-link.el)
@@ -476,7 +476,7 @@ files, I want it to stand out.
 (font-lock-add-keywords
   'text-mode
   '(("FIXME[:!]?" 0 'show-paren-mismatch-face)
-	("\\.\\( \\)\\b" 1 'extra-whitespace-face)))
+    ("\\.\\( \\)\\b" 1 'extra-whitespace-face)))
 }}}
 
 Now for XEmacs, we need to load `easy-mmode.el`. I just use the source
@@ -508,8 +508,8 @@ In order to navigate and fill bullet lists, I patched my `fill.el`
 {{{elisp
 (load-library "fill"); Stefan's bugfix included
 (add-hook 'wiki-mode-on-hook (lambda ()
-							   (setq paragraph-start "\\*\\|$" 
-									 paragraph-separate "$")))
+                               (setq paragraph-start "\\*\\|$" 
+                                     paragraph-separate "$")))
 }}}
 
 I want to use Shift TAB on GNU/Linux running under X to jump to the
@@ -517,7 +517,7 @@ previous reference.
 
 {{{elisp
 (if (not (featurep 'xemacs))
-	(define-key wiki-mode-map '[(shift iso-lefttab)] 'wiki-previous-reference)
+    (define-key wiki-mode-map '[(shift iso-lefttab)] 'wiki-previous-reference)
   (define-key wiki-mode-map '[(iso-left-tab)] 'wiki-previous-reference))
 }}}
 
@@ -540,10 +540,10 @@ These are the new XHTML 1.0 publishing rules:
    ("\n+\\'" . ""); remove emty lines at the end
    (end-of-buffer . "\n</p>"); add </p> at the end
    ("\n\n+" . "\n</p>\n<p>\n"); insert </p><p> between all paragraphs
-   ("^\\*[ 	]*" . "</li>\n<li>")
+   ("^\\*[  ]*" . "</li>\n<li>")
    ("\n</li>" . "</li>")
    ("<p></li>\\(\\(\\|.\\|\n\\)+\\)\n</p>" . "<ul>\\1</li>\n</ul>")
-   ("<p>\n\\([ 	]+\\(\\|.\\|\n\\)+\\)</p>" . "<pre>\n\\1</pre>")
+   ("<p>\n\\([  ]+\\(\\|.\\|\n\\)+\\)</p>" . "<pre>\n\\1</pre>")
    ("<p>\n:\\(\\(\\|.\\|\n\\)+\\)</p>" . "<blockquote>\n<p>\n \\1</p>\n</blockquote>")
    ;; ("<p>\n\\'" . "")
    ,(cons thing-at-point-url-regexp "<a href=\"\\&\">\\&</a>")
@@ -570,9 +570,9 @@ This is the old HTML 3.2 markup:
    ("&#39;&#39;\\(\\(\\|.\\)*\\)&#39;&#39;" . "<strong>\\1</strong>")
    ("\\`\n*" . "<p>\n")
    ("\n\n+" . "\n\n<p>\n")
-   ("^\\*[ 	]*" . "<li>")
+   ("^\\*[  ]*" . "<li>")
    ("<p>\n<li>\\(\\([^\n]\n?\\)+\\)" . "<p>\n<ul>\n<li>\\1</ul>\n")
-   ("<p>\n\\([ 	]+\\([^\n]\n?\\)+\\)" . "<p>\n<pre>\n\\1</pre>\n")
+   ("<p>\n\\([  ]+\\([^\n]\n?\\)+\\)" . "<p>\n<pre>\n\\1</pre>\n")
    ("<p>\n:\\(\\([^\n]\n?\\)+\\)" . "<blockquote>\n<p>\n\\1</blockquote>\n")
    ,(cons thing-at-point-url-regexp "<a href=\"\\&\">\\&</a>")
    ,(cons goto-address-mail-regexp "<a href=\"mailto:\\&\">\\&</a>")
