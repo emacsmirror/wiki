@@ -300,7 +300,7 @@ extended link pattern uses extra square brackets.
 
 Examples: 
 
-{{{text
+{{{
 Extended Link           Resulting HTML
 -----------------------------------------------------
 [[LINK]]                <a href="LINK">LINK</a>
