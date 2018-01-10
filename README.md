@@ -10,21 +10,21 @@ that would be [Org Mode](https://orgmode.org/).
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
-    - [Wiki Mode (wiki.el)](#wiki-mode-wikiel)
-    - [Page Summaries (wiki-sum.el)](#page-summaries-wiki-sumel)
-    - [Generating Meta Desciption Tags](#generating-meta-desciption-tags)
-    - [Private Pages and Wiki Projects (wiki-projects.el)](#private-pages-and-wiki-projects-wiki-projectsel)
-    - [Don't mode me](#dont-mode-me)
-    - [Guess Buffer Language](#guess-buffer-language)
-    - [Page Language](#page-language)
-    - [Spelling](#spelling)
-    - [Wiki Link (wiki-link.el)](#wiki-link-wiki-linkel)
-    - [Wiki Inter (wiki-inter.el)](#wiki-inter-wiki-interel)
-    - [Anchors](#anchors)
-    - [Link Graphs (wiki-dot.el)](#link-graphs-wiki-dotel)
-    - [Inline Images](#inline-images)
-    - [Links to other parts of your own site](#links-to-other-parts-of-your-own-site)
-    - [Sample Wiki Mode Setup](#sample-wiki-mode-setup)
+- [Wiki Mode (wiki.el)](#wiki-mode-wikiel)
+- [Page Summaries (wiki-sum.el)](#page-summaries-wiki-sumel)
+- [Generating Meta Desciption Tags](#generating-meta-desciption-tags)
+- [Private Pages and Wiki Projects (wiki-projects.el)](#private-pages-and-wiki-projects-wiki-projectsel)
+- [Don't mode me](#dont-mode-me)
+- [Guess Buffer Language](#guess-buffer-language)
+- [Page Language](#page-language)
+- [Spelling](#spelling)
+- [Wiki Link (wiki-link.el)](#wiki-link-wiki-linkel)
+- [Wiki Inter (wiki-inter.el)](#wiki-inter-wiki-interel)
+- [Anchors](#anchors)
+- [Link Graphs (wiki-dot.el)](#link-graphs-wiki-dotel)
+- [Inline Images](#inline-images)
+- [Links to other parts of your own site](#links-to-other-parts-of-your-own-site)
+- [Sample Wiki Mode Setup](#sample-wiki-mode-setup)
 
 <!-- markdown-toc end -->
 
