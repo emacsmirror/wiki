@@ -452,6 +452,176 @@ URL Fragment: http://www.geocities.com/kensanata/%s
 You could have achieved a similar effect using a rule in
 `wiki-pub-rules`. Such rules would not affect highlighting, however.
 
+## Editing a remote wiki
+
+(Note that these days there are better solutions! Simple Wiki Edit
+Mode replaces WikiRemote and no longer depends on url.el, for
+example.)
+
+This package allows you to load and save pages from a remote wiki
+using w3 functionality. Just call `wiki-remote-get` and enter page
+name and wiki name. In order to save, hit `C-c C-c`.
+
+`wiki-remote.el` requires `w3` or `w3m`.
+
+The state of support for various wiki engines is unclear. It used to
+work for Usemod, Zwiki and CLiki. As Oddmuse inherited the Usemod API,
+it should also work.
+
+If you want to follow links, you need a wiki mode to edit the file
+itself -- either Wiki Mode (see above) or Emacs Wiki Mode. The default
+is plain Text Mode, which is good enough to edit the page.
+
+There is a customizable option that allows you to choose which
+function to call once wiki-remote.el has downloaded the remote page.
+The new buffer will be in `wiki-remote-mode`, a minor mode that has
+just one keybinding: `C-c C-c`. That will save the page back to the
+server.
+
+Usemod detects editing conflicts by adding hidden fields to the form,
+so this data has to be stored in buffer local variables.  Zwiki
+detects editing conflicts using timestamps, I think.  When I tested
+this 2001-05-25, however, I saw no such timestamps while editing zwiki
+pages.  Who knows, maybe this has been rendered obsolete?
+
+Anyway, this thing is *useful for looong pages* -- because Netscape
+4.74 for GNU/Linux (the one I am using) will crash when you are
+editing very long pages (20k and more). Emacs to the rescue! Get the
+page using `wiki-remote.el`, edit, save, and continue browsing using
+your favorite browser...
+
+### Setting your Username
+
+If you are using `wiki-remote-get` to edit a page, you can save your
+edits using `C-c C-c`. All operations will use `url-retrieve` which is
+part of the `w3` package.
+
+Surf to the Emacs Wiki using `w3` and set your Preferences as usual.
+Note that you must delete the password. When I tried it, the default
+value of "*" caused an error when I saved my changes. Once you do
+that, the cookie will be created. Don't forget to save the cookie! Use
+`M-: (url-cookie-write-file)` to do that.
+
+### w3m-mode
+
+Yes, if you have `emacs-w3m`, you can use it as well. Here is from a
+mail, slightly edited.
+
+```
+ From: KahlilHodgson
+ Subject: wiki-remote.el
+ To: AlexSchroeder
+ Date: Fri, 27 Sep 2002 08:58:29 +1000
+```
+
+Here's some code that makes wiki-remote.el work if you have emacs-w3m
+installed INSTEAD of w3.
+
+```elisp
+(unless (condition-case nil
+			(require 'w3)
+		  (error nil))
+  (require 'w3m)
+
+  (defvar url-request-method nil)
+  (defvar url-request-data nil)
+  (defvar url-inhibit-mime-parsing nil)
+  (defalias 'url-hexify-string 'w3m-url-encode-string)
+
+  (defun url-retrieve (url)
+	"Return a buffer containing the HTML contents of URL using w3m."
+	(let ((w3m-async-exec nil)) ;; wait for output
+	  (set-buffer (get-buffer-create " *wiki-edit*")) ;; invisible
+	  (erase-buffer) ;; flush previous edit
+	  (w3m-retrieve url nil 'no-cache url-request-data)
+	  ;; want the cdr of the return value to a buffer object
+	  `(t . ,(current-buffer))))
+  )
+```
+
+### phpwiki support
+
+```elisp
+;; PhpWiki 1.3 support by ReiniUrban <rurban@x-ray.at>
+
+(defun phpwiki-get-page (page url)
+  "Return a buffer with the plain text contents of PAGE at URL."
+  (let* ((data (phpwiki-get-data page url))
+	 (text (cdr (assq 'text data)))
+	 (buf (get-buffer-create page)))
+	(set-buffer buf)
+	(erase-buffer)
+	(insert text)
+	;(setq phpwiki-data data)
+	buf))
+
+(defun phpwiki-get-data (page url)
+  "Extract the textarea content from the page."
+  (message "Reading %s at %s" page url)
+  (save-excursion
+	(let ((buf (cdr (url-retrieve (concat url "?action=viewsource&pagename=" 
+					  (url-hexify-string page))))))
+	  (when (null buf)
+	(error "Could not retrieve %s" url))
+	  (when wiki-remote-debug
+	(switch-to-buffer-other-window buf))
+	  (set-buffer buf)
+	  (goto-char (point-min))
+	  (let ((text 
+		 (if (search-forward-regexp "<textarea class=\"wikiedit\"\nname=\"content\"")
+		 (let ((start (search-forward-regexp ">"))
+			   end)
+		   (search-forward "</textarea>")
+		   (setq end (copy-marker (match-beginning 0)))
+		   (mapcar (lambda (pair)
+				 (wiki-remote-massage (car pair) (cdr pair) start end))
+			   '(("&gt;" . ">")
+				 ("&lt;" . "<")
+				 ("&quot;" . "\"")
+				 ("&amp;" . "&")
+				 ("^M" . "")))
+		   (buffer-substring start end)))))
+	`((text . ,text)
+	  (title . ,page))))))
+
+
+(defun phpwiki-put-page (page url content)
+  "Save buffer to wiki at URL with new CONTENT."
+  (interactive)
+  (unless (buffer-modified-p)
+	(error "No changes need to be saved"))
+  (let ((url-request-method "POST")
+	(url-request-data
+	 (concat
+	  "edit[save]=Save&edit[summary]=" (url-hexify-string (read-from-minibuffer "Summary: " ""))
+	  "&action=edit&pagename=" (url-hexify-string page)
+	  "&edit[content]=" (url-hexify-string content)))
+	;:(url-inhibit-mime-parsing t) ; ??
+	(request (concat url (url-hexify-string page) "?action=edit")))
+	(message "Saving...")
+	(let ((buf (cdr (url-retrieve request))))
+	  (message "Verifying...")
+	  (when wiki-remote-debug
+	(switch-to-buffer-other-window buf))
+	  (when (not (phpwiki-verify-page buf page))
+	(error "Error saving page")))))
+
+
+(defun phpwiki-verify-page (buf page)
+  "Verify that buffer BUF actually contains Saved: PAGE.
+This should catch all errors caused by the wiki engine
+that do not result in a HTTP error."
+  (save-excursion
+	(set-buffer buf)
+	(goto-char (point-min))
+	(and (search-forward "<!-- Page title -->" nil t)
+	 ;; Strip out localized "<h1>Saved: " message
+	 ;; An unsuccessful save has <h1><a href="HomePage?action=BackLinks"
+	 (search-forward (concat "<a href=\"" page "\" class=\"wiki\">" 
+				 page 
+				 "</a></h1>\n<!-- End top -->") nil t))))
+```
+
 ## Sample Wiki Mode Setup
 
 The setup I use with Wiki Mode works in Emacs and XEmacs.
