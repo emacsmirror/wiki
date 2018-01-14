@@ -10,21 +10,26 @@ that would be [Org Mode](https://orgmode.org/).
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
-- [Wiki Mode (wiki.el)](#wiki-mode-wikiel)
-- [Page Summaries (wiki-sum.el)](#page-summaries-wiki-sumel)
-- [Generating Meta Desciption Tags](#generating-meta-desciption-tags)
-- [Private Pages and Wiki Projects (wiki-projects.el)](#private-pages-and-wiki-projects-wiki-projectsel)
-- [Don't mode me](#dont-mode-me)
-- [Guess Buffer Language](#guess-buffer-language)
-- [Page Language](#page-language)
-- [Spelling](#spelling)
-- [Wiki Link (wiki-link.el)](#wiki-link-wiki-linkel)
-- [Wiki Inter (wiki-inter.el)](#wiki-inter-wiki-interel)
-- [Anchors](#anchors)
-- [Link Graphs (wiki-dot.el)](#link-graphs-wiki-dotel)
-- [Inline Images](#inline-images)
-- [Links to other parts of your own site](#links-to-other-parts-of-your-own-site)
-- [Sample Wiki Mode Setup](#sample-wiki-mode-setup)
+- [Wiki Mode](#wiki-mode)
+    - [Wiki Mode (wiki.el)](#wiki-mode-wikiel)
+    - [Page Summaries (wiki-sum.el)](#page-summaries-wiki-sumel)
+    - [Generating Meta Desciption Tags](#generating-meta-desciption-tags)
+    - [Private Pages and Wiki Projects (wiki-projects.el)](#private-pages-and-wiki-projects-wiki-projectsel)
+    - [Don't mode me](#dont-mode-me)
+    - [Guess Buffer Language](#guess-buffer-language)
+    - [Page Language](#page-language)
+    - [Spelling](#spelling)
+    - [Wiki Link (wiki-link.el)](#wiki-link-wiki-linkel)
+    - [Wiki Inter (wiki-inter.el)](#wiki-inter-wiki-interel)
+    - [Anchors](#anchors)
+    - [Link Graphs (wiki-dot.el)](#link-graphs-wiki-dotel)
+    - [Inline Images](#inline-images)
+    - [Links to other parts of your own site](#links-to-other-parts-of-your-own-site)
+    - [Editing a remote wiki (wiki-remote.el)](#editing-a-remote-wiki-wiki-remoteel)
+        - [Setting your Username](#setting-your-username)
+        - [w3m-mode](#w3m-mode)
+        - [phpwiki support](#phpwiki-support)
+    - [Sample Wiki Mode Setup](#sample-wiki-mode-setup)
 
 <!-- markdown-toc end -->
 
@@ -452,7 +457,7 @@ URL Fragment: http://www.geocities.com/kensanata/%s
 You could have achieved a similar effect using a rule in
 `wiki-pub-rules`. Such rules would not affect highlighting, however.
 
-## Editing a remote wiki
+## Editing a remote wiki (wiki-remote.el)
 
 (Note that these days there are better solutions! Simple Wiki Edit
 Mode replaces WikiRemote and no longer depends on url.el, for
